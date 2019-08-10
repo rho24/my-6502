@@ -8,7 +8,7 @@ entity P6502_tb is
 end P6502_tb;
 
 
-architecture behav of P6502_tb is
+architecture behavioral of P6502_tb is
   --  Declaration of the component that will be instantiated.
   component P6502
       port( 
@@ -16,22 +16,20 @@ architecture behav of P6502_tb is
         nmi, nres, irq  : in std_logic;   -- Interrupt lines (active low)
         data_in         : in std_logic_vector(7 downto 0);  -- Data from memory
         data_out        : out std_logic_vector(7 downto 0); -- Data to memory
-        address_out     : out std_logic_vector(15 downto 0);-- Address bus to memory
+        address     : out std_logic_vector(15 downto 0);-- Address bus to memory
         we  : out std_logic -- Access control to data memory ('0' for Reads, '1' for Writes)
     );
   end component;
-  constant half_period : time := 5 us;
+  constant tick : time := 10 ns;
   constant PC_INIT : UNSIGNED(15 downto 0) := x"4000";
-  signal clk, finished : std_logic := '0'; -- make sure you initialise!
+  signal clk : std_logic := '1';
   signal rst, ready, nmi, nres, irq : std_logic := '0';
   signal we : std_logic;
   signal data_in: std_logic_vector(7 downto 0) := x"00";
   signal data_out: std_logic_vector(7 downto 0);
-  signal address_out: std_logic_vector(15 downto 0);
+  signal address: std_logic_vector(15 downto 0);
 
 begin
-
-  clk <= not clk after half_period when finished /= '1' else '0';
 
   cpu : entity work.P6502
     generic map (
@@ -46,17 +44,16 @@ begin
       irq   => irq,
       data_in => data_in,
       data_out => data_out,
-      address_out => address_out,
+      address => address,
       we => we
     );
 
-  process
-  begin
 
-    wait for 100 * half_period;
+    rst <= '1', '0' after 1*tick;
+    ready <= '0', '1' after 2*tick;
+    -- clk <= not clk after 5 ns;    -- 100 MHz
+    clk <= not clk after tick/2;    -- 100 MHz
 
-    assert false report "end of test" severity note;
-    finished <= '1';
-    wait;
-  end process;
-end behav;
+    data_in <= x"69", x"0f" after 5*tick;
+    
+end behavioral;

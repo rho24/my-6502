@@ -20,6 +20,8 @@ package Common is
     constant OVERFLOW  : integer := 6;
     constant NEGATIVE  : integer := 7;
 
+    -- Instructions execution cycle
+    type State is (T0, T1, T2, T3, T4, T5, T6, T7);
 
     type ALU_Operation_type is (
         ALU_AND, ALU_OR, ALU_XOR,
@@ -27,4 +29,5 @@ package Common is
         ALU_DEC, ALU_DECHC, ALU_ASL, ALU_LSR, 
         ALU_ROL, ALU_ROR, ALU_NOP
     );
+
 end Common;

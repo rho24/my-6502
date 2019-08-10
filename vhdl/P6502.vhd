@@ -9,7 +9,7 @@ entity P6502 is
         nmi, nres, irq  : in std_logic;   -- Interrupt lines (active low)
         data_in         : in std_logic_vector(7 downto 0);  -- Data from memory
         data_out        : out std_logic_vector(7 downto 0); -- Data to memory
-        address_out     : out std_logic_vector(15 downto 0);-- Address bus to memory
+        address     : out std_logic_vector(15 downto 0);-- Address bus to memory
         we              : out std_logic -- Access control to data memory ('0' for Reads, '1' for Writes)
     );
 end P6502;
@@ -70,5 +70,11 @@ begin
         overflow => StatusReg_d(OVERFLOW)
     );
 
-
+    Control: entity work.Control
+    port map (
+        clk => clk,
+        rst => rst,
+        ready => ready,
+        data_in => data_in
+    );
 end architecture;
