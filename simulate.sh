@@ -3,4 +3,5 @@ if [ ! -d ./.vsim ]; then
     mkdir ./.vsim
 fi
 cd ./.vsim
-vsim P6502_tb -do wave.do > /dev/null &
+vmap work ../.work
+vsim P6502_tb -do ../modelsim/wave.do > /dev/null &
