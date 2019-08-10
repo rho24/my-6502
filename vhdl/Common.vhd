@@ -30,4 +30,50 @@ package Common is
         ALU_ROL, ALU_ROR, ALU_NOP
     );
 
+    type OpCode is (
+        LDA, LDX, LDY,
+        STA, STX, STY,
+        ADC, SBC,
+        INC, INX, INY,
+        DEC, DEX, DEY,
+        TAX, TAY, TXA, TYA,
+        AAND, EOR, ORA,
+        CMP, CPX, CPY, BITT,
+        ASL, LSR, ROLL, RORR,
+        JMP, BCC, BCS, BEQ, BMI, BNE, BPL, BVC, BVS,
+        TSX, TXS, PHA, PHP, PLA, PLP,
+        CLC, CLD, CLI, CLV, SECi, SED, SEI,
+        JSR, RTS, BRK, RTI, NOP,
+
+        invalid_instruction
+    );
+
+    type Instruction is record
+        opcode: OpCode;
+        size: integer range 1 to 3;
+    end record;
+
+    function InstructionDecoder(data: in std_logic_vector(7 downto 0)) return Instruction;
+
+    type ControlSignals is record
+        PcReg_ce: std_logic;
+        AddressReg_ce: std_logic;
+        AccumulatorReg_ce: std_logic;
+        AluOperation: ALU_Operation_type;
+    end record;
+end Common;
+
+package body Common is
+    function InstructionDecoder(data: in std_logic_vector(7 downto 0)) return Instruction is
+        
+        variable i: Instruction;
+
+    begin
+        case data is
+            when x"69" => i.opcode := ADC; i.size := 2;
+            when others => i.opcode := invalid_instruction;
+        end case;
+        return i;
+    end InstructionDecoder;
+
 end Common;

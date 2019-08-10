@@ -16,7 +16,7 @@ architecture behavioral of P6502_tb is
         nmi, nres, irq  : in std_logic;   -- Interrupt lines (active low)
         data_in         : in std_logic_vector(7 downto 0);  -- Data from memory
         data_out        : out std_logic_vector(7 downto 0); -- Data to memory
-        address     : out std_logic_vector(15 downto 0);-- Address bus to memory
+        address_out     : out std_logic_vector(15 downto 0);-- Address bus to memory
         we  : out std_logic -- Access control to data memory ('0' for Reads, '1' for Writes)
     );
   end component;
@@ -27,7 +27,7 @@ architecture behavioral of P6502_tb is
   signal we : std_logic;
   signal data_in: std_logic_vector(7 downto 0) := x"00";
   signal data_out: std_logic_vector(7 downto 0);
-  signal address: std_logic_vector(15 downto 0);
+  signal address_out: std_logic_vector(15 downto 0);
 
 begin
 
@@ -44,16 +44,18 @@ begin
       irq   => irq,
       data_in => data_in,
       data_out => data_out,
-      address => address,
+      address_out => address_out,
       we => we
     );
 
 
     rst <= '1', '0' after 1*tick;
     ready <= '0', '1' after 2*tick;
-    -- clk <= not clk after 5 ns;    -- 100 MHz
     clk <= not clk after tick/2;    -- 100 MHz
 
-    data_in <= x"69", x"0f" after 5*tick;
+    data_in <= x"69",
+               x"0f" after 2.6*tick,
+               x"69" after 4.6*tick,
+               x"0f" after 6.6*tick;
     
 end behavioral;
