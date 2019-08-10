@@ -52,10 +52,15 @@ begin
     rst <= '1', '0' after 1*tick;
     ready <= '0', '1' after 2*tick;
     clk <= not clk after tick/2;    -- 100 MHz
-
-    data_in <= x"69",
-               x"0f" after 2.6*tick,
-               x"69" after 4.6*tick,
-               x"0f" after 6.6*tick;
     
+    process
+    begin
+      wait for 1.6*tick;
+      loop
+        data_in <= x"69";
+        wait for 1*tick;
+        data_in <= x"03";
+        wait for 1*tick;
+      end loop;
+    end process;
 end behavioral;

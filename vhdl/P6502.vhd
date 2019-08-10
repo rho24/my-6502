@@ -17,8 +17,8 @@ end P6502;
 architecture arch of P6502 is
     signal control_out: ControlSignals;
     signal PcReg_d, PcReg_q, AddressReg_d, AddressReg_q: std_logic_vector(15 downto 0);
-    signal AluAReg_d, AluAReg_q, AluBReg_d, AluBReg_q, AccumulatorReg_d, AccumulatorReg_q, StatusReg_d, StatusReg_q: std_logic_vector(7 downto 0);
-    signal AluResult: std_logic_vector(7 downto 0);
+    signal AccumulatorReg_d, AccumulatorReg_q, StatusReg_d, StatusReg_q: std_logic_vector(7 downto 0);
+    signal alu_a, alu_b, alu_result: std_logic_vector(7 downto 0);
     signal operation: ALU_Operation_type;
 begin
 
@@ -46,24 +46,6 @@ begin
             q       => AddressReg_q
     );
     
-    AluAReg: entity work.RegisterVector
-    port map (
-            clk     => clk,
-            rst     => rst,
-            ce      => '1',
-            d       => AluAReg_d,
-            q       => AluAReg_q
-    );
-    
-    AluBReg: entity work.RegisterVector
-    port map (
-            clk     => clk,
-            rst     => rst,
-            ce      => '1',
-            d       => AluBReg_d,
-            q       => AluBReg_q
-    );
-    
     AccumulatorReg: entity work.RegisterVector
     port map (
             clk     => clk,
@@ -75,11 +57,11 @@ begin
 
     Alu: entity work.Alu
     port map (
-        a => AluAReg_q,
-        b => AluBReg_q,
+        a => alu_a,
+        b => alu_b,
         carry_in => StatusReg_q(CARRY),
         operation => control_out.AluOperation,
-        result => AluResult,
+        result => alu_result,
         carry_out => StatusReg_d(CARRY),
         overflow => StatusReg_d(OVERFLOW)
     );
@@ -96,10 +78,11 @@ begin
     PcReg_d <= STD_LOGIC_VECTOR(UNSIGNED(PcReg_q) + 1);
     AddressReg_d <= PcReg_q;
 
-    AluAReg_d <= AccumulatorReg_q;
-    AluBReg_d <= data_in;
+    alu_a <= AccumulatorReg_q;
+    alu_b <= data_in;
 
-    AccumulatorReg_d <= AluResult;
+    AccumulatorReg_d <= alu_result;
 
     address_out <= AddressReg_q;
+    data_out <= AccumulatorReg_q;
 end architecture;

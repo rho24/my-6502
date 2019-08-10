@@ -46,14 +46,24 @@ begin
 
     process(current_state,instruction)
     begin
-        if instruction.opcode = invalid_instruction then
-            next_state <= T0;
-        elsif current_state = T0 then
-            next_state <= T1;
-        elsif current_state = T1 and instruction.size /= 1 then
-            next_state <= T2;
-        elsif current_state = T2 and instruction.size /= 2 then
-            next_state <= T3;
+        if current_state = T0 then
+            if instruction.size = 1 then
+                next_state <= T0;
+            else
+                next_state <= T1;
+            end if;
+        elsif current_state = T1 then
+            if instruction.size = 2 then
+                next_state <= T0;
+            else
+                next_state <= T2;
+            end if;
+        elsif current_state = T2 then
+            if instruction.size = 3 then
+                next_state <= T0;
+            else
+                next_state <= T3;
+            end if;
         else
             next_state <= T0;
         end if;
