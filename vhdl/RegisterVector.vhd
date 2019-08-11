@@ -20,7 +20,7 @@ begin
     begin
         if rst = '1' then
             q <= STD_LOGIC_VECTOR(TO_UNSIGNED(0,WIDTH));
-        elsif rising_edge(clk) then
+        elsif clk = '1' then
             if ce = '1' then
                 q <= d;
             end if;

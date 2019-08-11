@@ -29,15 +29,15 @@ begin
 
     InstructionReg: entity work.RegisterVector
     port map (
-        clk     => InstructionReg_clk,
+        clk     => clk1,
         rst     => rst,
-        ce      => '1',
+        ce      => InstructionReg_clk,
         d       => PreDecodeReg_q,
         q       => InstructionReg_q
     );
 
     current_state_is_T0 <= '1' when current_state = T0 else '0';
-    InstructionReg_clk <= current_state_is_T0 and rdy and clk1;
+    InstructionReg_clk <= current_state_is_T0 and rdy;
     instruction <= InstructionDecoder(InstructionReg_q);
 
     process(rst,clk1,rdy)
