@@ -49,6 +49,7 @@ package Common is
     );
 
     type AddressMode is (
+        Implied,
         Immediate,
         ZeroPage
     );
@@ -90,7 +91,12 @@ package body Common is
         case data is
             -- ADC
             when x"69" => i.opcode := ADC; i.address_mode := Immediate; i.size := 2;
-            when x"65" => i.opcode := ADC; i.address_mode := ZeroPage; i.size := 3;
+            when x"65" => i.opcode := ADC; i.address_mode := ZeroPage; i.size  := 3;
+            -- ORA
+            when x"09" => i.opcode := ORA; i.address_mode := Immediate; i.size := 2;
+            when x"05" => i.opcode := ORA; i.address_mode := ZeroPage; i.size  := 3;
+            -- NOP
+            when x"EA" => i.opcode := NOP; i.address_mode := Implied; i.size := 2;
 
             when others => i.opcode := invalid_instruction;
         end case;

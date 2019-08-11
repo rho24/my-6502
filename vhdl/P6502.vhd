@@ -26,6 +26,8 @@ architecture arch of P6502 is
     signal AInputReg_d, AInputReg_q, BInputReg_d, BInputReg_q, AdderHoldReg_d, AdderHoldReg_q: std_logic_vector(7 downto 0);
     signal XReg_q, YReg_q: std_logic_vector(7 downto 0);
     signal operation: ALU_Operation_type;
+
+    signal PC: std_logic_vector(15 downto 0);
 begin
     
     clk1 <= not clk;
@@ -86,7 +88,7 @@ begin
     
     AInputReg: entity work.RegisterVector
     port map (
-            clk     => clk2,
+            clk     => clk1,
             rst     => rst,
             ce      => control_out.AInputReg_ce,
             d       => AInputReg_d,
@@ -95,7 +97,7 @@ begin
     
     BInputReg: entity work.RegisterVector
     port map (
-            clk     => clk2,
+            clk     => clk1,
             rst     => rst,
             ce      => control_out.BInputReg_ce,
             d       => BInputReg_d,
@@ -135,6 +137,7 @@ begin
     StatusReg_q <= (others => '0');
     PcLowReg_d <= STD_LOGIC_VECTOR(UNSIGNED(address_bus_low) + 1);
     PcHighReg_d <= address_bus_high;
+    PC <= PcHighReg_q & PcLowReg_q;
     
     process(control_out.address_bus_low_mux,PcLowReg_q,InputDataLatch_q,StackPointerReg_q)
     begin

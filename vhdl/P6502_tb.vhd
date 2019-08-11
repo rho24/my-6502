@@ -55,12 +55,17 @@ begin
     process(address_out)
     begin
       case address_out is
-        when x"0000" => data_in <= x"69";
-        when x"0001" => data_in <= x"03";
-        when x"0002" => data_in <= x"69";
-        when x"0003" => data_in <= x"03";
-        when x"0004" => data_in <= x"65";
-        when x"0005" => data_in <= x"f1";
+        when x"0000" => data_in <= x"EA";
+        when x"0001" => data_in <= x"09";
+        when x"0002" => data_in <= x"03";
+        when x"0003" => data_in <= x"05";
+        when x"0004" => data_in <= x"F1";
+        when x"0005" => data_in <= x"69";
+        when x"0006" => data_in <= x"01";
+        when x"0007" => data_in <= x"EA";
+        when x"0008" => data_in <= x"EA";
+        when x"0009" => data_in <= x"EA";
+        when x"000A" => data_in <= x"EA";
         when x"00f1" => data_in <= x"04";
         when others  => data_in <= x"00";
       end case;

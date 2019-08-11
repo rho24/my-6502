@@ -40,7 +40,7 @@ begin
     InstructionReg_clk <= current_state_is_T0 and rdy and clk1;
     instruction <= InstructionDecoder(InstructionReg_q);
 
-    process(rst,clk1)
+    process(rst,clk1,rdy)
     begin
         if rst = '1' then
             current_state <= T0;
@@ -89,27 +89,28 @@ begin
         control_out.PcHighReg_ce <= '0';
         control_out.AddressLowReg_ce <= '0';
         control_out.AddressHighReg_ce <= '0';
-        control_out.AInputReg_ce <= '1';
-        control_out.BInputReg_ce <= '1';
+        control_out.AInputReg_ce <= '0';
+        control_out.BInputReg_ce <= '0';
         control_out.AccumulatorReg_ce <= '0';
         control_out.address_bus_low_mux <= 0;
         control_out.address_bus_high_mux <= 0;
         control_out.data_bus_mux <= 0;
         control_out.stack_bus_mux <= 0;
-        control_out.a_input_mux <= 1;
-        control_out.b_input_mux <= 1;
+        control_out.a_input_mux <= 0;
+        control_out.b_input_mux <= 0;
         control_out.AluOperation <= OpCodeToAluOperation(instruction.opcode);
 
         if rdy = '1' and instruction.opcode /= invalid_instruction then
             control_out.PcLowReg_ce <= '1';
             control_out.PcHighReg_ce <= '1';
             case current_state is
-                when T0 =>  
+                when T0 =>
                             control_out.AddressLowReg_ce <= '1';
                             control_out.AddressHighReg_ce <= '1';
                             control_out.address_bus_low_mux <= 2;
                             control_out.address_bus_high_mux <= 2;
-                when T1 =>  if instruction.address_mode = ZeroPage then
+                when T1 =>  
+                            if instruction.address_mode = ZeroPage then
                                 control_out.AddressLowReg_ce <= '1';
                                 control_out.AddressHighReg_ce <= '1';
                                 control_out.address_bus_low_mux <= 2;
