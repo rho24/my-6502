@@ -10,6 +10,8 @@ add wave -divider
 add wave -noupdate -format Logic -radix hexadecimal sim:/p6502_tb/cpu/Control/current_state sim:/p6502_tb/cpu/Control/next_state
 add wave -noupdate -format Logic -radix hexadecimal sim:/p6502_tb/cpu/Control/instruction
 add wave -noupdate -format Logic -radix hexadecimal sim:/p6502_tb/cpu/Control/control_out
+add wave -divider
+add wave -noupdate -format Logic -radix hexadecimal sim:/p6502_tb/cpu/Control/PreDecodeReg_q sim:/p6502_tb/cpu/Control/InstructionReg_q
 
 run 200 ns
 

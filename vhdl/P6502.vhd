@@ -15,19 +15,34 @@ entity P6502 is
 end P6502;
 
 architecture arch of P6502 is
+    signal clk1, clk2: std_logic;
     signal control_out: ControlSignals;
-    signal PcReg_d, PcReg_q, AddressReg_d, AddressReg_q: std_logic_vector(15 downto 0);
-    signal AccumulatorReg_d, AccumulatorReg_q, StatusReg_d, StatusReg_q: std_logic_vector(7 downto 0);
+
+    signal address_bus: std_logic_vector(15 downto 0);
+    signal data_bus: std_logic_vector(8 downto 0);
+    signal PcReg_d, PcReg_q, AddressReg_q: std_logic_vector(15 downto 0);
+    signal InputDataLatch_q, AccumulatorReg_d, AccumulatorReg_q, StatusReg_d, StatusReg_q: std_logic_vector(7 downto 0);
     signal alu_a, alu_b, alu_result: std_logic_vector(7 downto 0);
     signal operation: ALU_Operation_type;
 begin
+    
+    clk1 <= not clk;
+    clk2 <= not clk1;
+
+    InputDataLatch: entity work.LatchVector
+    port map (
+        load => clk2,
+        rst => rst,
+        d => data_in,
+        q => InputDataLatch_q
+    );
 
     PcReg: entity work.RegisterVector
     generic map (
         WIDTH => 16
     )
     port map (
-            clk     => clk,
+            clk     => clk2,
             rst     => rst,
             ce      => control_out.PcReg_ce,
             d       => PcReg_d,
@@ -39,16 +54,16 @@ begin
         WIDTH => 16
     )
     port map (
-            clk     => clk,
+            clk     => clk1,
             rst     => rst,
             ce      => control_out.AddressReg_ce,
-            d       => AddressReg_d,
+            d       => address_bus,
             q       => AddressReg_q
     );
     
     AccumulatorReg: entity work.RegisterVector
     port map (
-            clk     => clk,
+            clk     => clk1,
             rst     => rst,
             ce      => control_out.AccumulatorReg_ce,
             d       => AccumulatorReg_d,
@@ -68,7 +83,8 @@ begin
 
     Control: entity work.Control
     port map (
-        clk => clk,
+        clk1 => clk1,
+        clk2 => clk2,
         rst => rst,
         ready => ready,
         data_in => data_in,
@@ -76,7 +92,7 @@ begin
     );
 
     PcReg_d <= STD_LOGIC_VECTOR(UNSIGNED(PcReg_q) + 1);
-    AddressReg_d <= PcReg_q;
+    address_bus <= PcReg_q;
 
     alu_a <= AccumulatorReg_q;
     alu_b <= data_in;

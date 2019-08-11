@@ -48,19 +48,16 @@ begin
       we => we
     );
 
-
     rst <= '1', '0' after 1*tick;
     ready <= '0', '1' after 2*tick;
     clk <= not clk after tick/2;    -- 100 MHz
     
-    process
+    process(address_out)
     begin
-      wait for 1.6*tick;
-      loop
+      if address_out(0) = '0' then
         data_in <= x"69";
-        wait for 1*tick;
+      else
         data_in <= x"03";
-        wait for 1*tick;
-      end loop;
+      end if;
     end process;
 end behavioral;

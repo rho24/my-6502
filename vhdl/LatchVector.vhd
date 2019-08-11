@@ -2,28 +2,25 @@ library ieee ;
     use ieee.std_logic_1164.all ;
     use ieee.numeric_std.all ;
 
-entity RegisterVector is
+entity LatchVector is
   generic (
       WIDTH: integer := 8
   );
   port (
-    clk, rst, ce: in std_logic;
+    load, rst: in std_logic;
     d: in std_logic_vector (WIDTH-1 downto 0);
     q: out std_logic_vector (WIDTH-1 downto 0)
   );
-end RegisterVector ; 
+end LatchVector ; 
 
-architecture arch of RegisterVector is
+architecture arch of LatchVector is
 begin
-
-    process(clk, rst)
+    process(load,rst)
     begin
         if rst = '1' then
-            q <= STD_LOGIC_VECTOR(TO_UNSIGNED(0,WIDTH));
-        elsif rising_edge(clk) then
-            if ce = '1' then
-                q <= d;
-            end if;
+            q <= (others => '0');
+        elsif load = '1' then
+            q <= d;
         end if;
     end process;
 end architecture;

@@ -14,6 +14,7 @@ fi
 vcom \
     ../vhdl/Common.vhd \
     ../vhdl/RegisterVector.vhd \
+    ../vhdl/LatchVector.vhd \
     ../vhdl/Alu.vhd \
     ../vhdl/Control.vhd \
     ../vhdl/P6502.vhd \
