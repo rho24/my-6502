@@ -48,9 +48,15 @@ package Common is
         invalid_instruction
     );
 
+    type AddressMode is (
+        Immediate,
+        ZeroPage
+    );
+
     type Instruction is record
         opcode: OpCode;
         alu_operation: ALU_Operation_type;
+        address_mode: AddressMode;
         size: integer range 1 to 3;
     end record;
 
@@ -58,9 +64,19 @@ package Common is
     function OpCodeToAluOperation(opcode: OpCode) return ALU_Operation_type;
 
     type ControlSignals is record
-        PcReg_ce: std_logic;
-        AddressReg_ce: std_logic;
+        PcLowReg_ce: std_logic;
+        PcHighReg_ce: std_logic;
+        AddressLowReg_ce: std_logic;
+        AddressHighReg_ce: std_logic;
+        AInputReg_ce: std_logic;
+        BInputReg_ce: std_logic;
         AccumulatorReg_ce: std_logic;
+        address_bus_low_mux: integer range 0 to 5;
+        address_bus_high_mux: integer range 0 to 5;
+        a_input_mux: integer range 0 to 1;
+        b_input_mux: integer range 0 to 2;
+        data_bus_mux: integer range 0 to 7;
+        stack_bus_mux: integer range 0 to 8;
         AluOperation: ALU_Operation_type;
     end record;
 end Common;
@@ -73,8 +89,8 @@ package body Common is
     begin
         case data is
             -- ADC
-            when x"69" => i.opcode := ADC; i.size := 2;
-            when x"65" => i.opcode := ADC; i.size := 3;
+            when x"69" => i.opcode := ADC; i.address_mode := Immediate; i.size := 2;
+            when x"65" => i.opcode := ADC; i.address_mode := ZeroPage; i.size := 3;
 
             when others => i.opcode := invalid_instruction;
         end case;

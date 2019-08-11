@@ -54,10 +54,15 @@ begin
     
     process(address_out)
     begin
-      if address_out(0) = '0' then
-        data_in <= x"69";
-      else
-        data_in <= x"03";
-      end if;
+      case address_out is
+        when x"0000" => data_in <= x"69";
+        when x"0001" => data_in <= x"03";
+        when x"0002" => data_in <= x"69";
+        when x"0003" => data_in <= x"03";
+        when x"0004" => data_in <= x"65";
+        when x"0005" => data_in <= x"f1";
+        when x"00f1" => data_in <= x"04";
+        when others  => data_in <= x"00";
+      end case;
     end process;
 end behavioral;

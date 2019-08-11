@@ -12,7 +12,7 @@ entity Control is
 end Control; 
 
 architecture arch of Control is
-    signal InstructionReg_clk, current_state_is_T1: std_logic;
+    signal rdy, InstructionReg_clk, current_state_is_T0: std_logic;
     signal PreDecodeReg_q, InstructionReg_q: std_logic_vector(7 downto 0);
     signal current_state, next_state: State;
     signal instruction: Instruction;
@@ -36,19 +36,27 @@ begin
         q       => InstructionReg_q
     );
 
-    current_state_is_T1 <= '1' when current_state = T1 else '0';
-    InstructionReg_clk <= current_state_is_T1 or ready or clk1;
+    current_state_is_T0 <= '1' when current_state = T0 else '0';
+    InstructionReg_clk <= current_state_is_T0 and rdy and clk1;
     instruction <= InstructionDecoder(InstructionReg_q);
 
     process(rst,clk1)
     begin
         if rst = '1' then
             current_state <= T0;
-        elsif rising_edge(clk1) and ready = '1' then
+        elsif rising_edge(clk1) and rdy = '1' then
             current_state <= next_state;
         end if;
     end process;
-    
+
+    process(rst,clk1)
+    begin
+        if rst = '1' then
+            rdy <= '0';
+        elsif rising_edge(clk1) then
+            rdy <= ready;
+        end if;
+    end process;
 
     process(current_state,instruction)
     begin
@@ -75,16 +83,49 @@ begin
         end if;
     end process;
 
-    process(rst,current_state,instruction)
+    process(rdy,current_state,instruction)
     begin
-        if rst = '1' or instruction.opcode = invalid_instruction then
-            control_out <= ('0','0', '0', OpCodeToAluOperation(instruction.opcode));
-        elsif current_state = T0 then
-            control_out <= ('1','1', '0', OpCodeToAluOperation(instruction.opcode));
-        elsif current_state = T1 then
-            control_out <= ('1','1', '1', OpCodeToAluOperation(instruction.opcode));
-        else
-            control_out <= ('0','0', '0', OpCodeToAluOperation(instruction.opcode));
+        control_out.PcLowReg_ce <= '0';
+        control_out.PcHighReg_ce <= '0';
+        control_out.AddressLowReg_ce <= '0';
+        control_out.AddressHighReg_ce <= '0';
+        control_out.AInputReg_ce <= '1';
+        control_out.BInputReg_ce <= '1';
+        control_out.AccumulatorReg_ce <= '0';
+        control_out.address_bus_low_mux <= 0;
+        control_out.address_bus_high_mux <= 0;
+        control_out.data_bus_mux <= 0;
+        control_out.stack_bus_mux <= 0;
+        control_out.a_input_mux <= 1;
+        control_out.b_input_mux <= 1;
+        control_out.AluOperation <= OpCodeToAluOperation(instruction.opcode);
+
+        if rdy = '1' and instruction.opcode /= invalid_instruction then
+            control_out.PcLowReg_ce <= '1';
+            control_out.PcHighReg_ce <= '1';
+            case current_state is
+                when T0 =>  
+                            control_out.AddressLowReg_ce <= '1';
+                            control_out.AddressHighReg_ce <= '1';
+                            control_out.address_bus_low_mux <= 2;
+                            control_out.address_bus_high_mux <= 2;
+                when T1 =>  if instruction.address_mode = ZeroPage then
+                                control_out.AddressLowReg_ce <= '1';
+                                control_out.AddressHighReg_ce <= '1';
+                                control_out.address_bus_low_mux <= 2;
+                                control_out.address_bus_high_mux <= 2;
+                                control_out.AccumulatorReg_ce <= '1';
+                            else
+                                control_out.AddressLowReg_ce <= '1';
+                                control_out.AddressHighReg_ce <= '1';
+                                control_out.address_bus_low_mux <= 2;
+                                control_out.address_bus_high_mux <= 2;
+                                control_out.data_bus_mux <= 4;
+                                control_out.stack_bus_mux <= 4;
+                                control_out.AccumulatorReg_ce <= '1';
+                            end if;
+                when others => null;
+            end case;
         end if;
     end process;
 end architecture;
