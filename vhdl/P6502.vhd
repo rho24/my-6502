@@ -91,6 +91,7 @@ begin
         control_out => control_out
     );
 
+    StatusReg_q <= (others => '0');
     PcReg_d <= STD_LOGIC_VECTOR(UNSIGNED(PcReg_q) + 1);
     address_bus <= PcReg_q;
 

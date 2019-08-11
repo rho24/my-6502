@@ -50,10 +50,12 @@ package Common is
 
     type Instruction is record
         opcode: OpCode;
+        alu_operation: ALU_Operation_type;
         size: integer range 1 to 3;
     end record;
 
     function InstructionDecoder(data: in std_logic_vector(7 downto 0)) return Instruction;
+    function OpCodeToAluOperation(opcode: OpCode) return ALU_Operation_type;
 
     type ControlSignals is record
         PcReg_ce: std_logic;
@@ -70,10 +72,28 @@ package body Common is
 
     begin
         case data is
+            -- ADC
             when x"69" => i.opcode := ADC; i.size := 2;
+            when x"65" => i.opcode := ADC; i.size := 3;
+
             when others => i.opcode := invalid_instruction;
         end case;
         return i;
     end InstructionDecoder;
 
+    function OpCodeToAluOperation(opcode: OpCode) return ALU_Operation_type is
+        variable result: ALU_Operation_type;
+    begin
+        case opcode is
+            when AAND => result := ALU_AND;
+            when ORA  => result := ALU_OR;
+            when EOR  => result := ALU_XOR;
+            when DEC  => result := ALU_DEC;
+            when ADC  => result := ALU_ADC;
+            when ROLL => result := ALU_ROL;
+            when RORR => result := ALU_ROR;
+            when others => result := ALU_NOP;
+        end case;
+        return result;
+    end OpCodeToAluOperation;
 end Common;

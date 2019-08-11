@@ -78,13 +78,13 @@ begin
     process(rst,current_state,instruction)
     begin
         if rst = '1' or instruction.opcode = invalid_instruction then
-            control_out <= ('0','0', '0', ALU_NOP);
+            control_out <= ('0','0', '0', OpCodeToAluOperation(instruction.opcode));
         elsif current_state = T0 then
-            control_out <= ('1','1', '0', ALU_ADD);
+            control_out <= ('1','1', '0', OpCodeToAluOperation(instruction.opcode));
         elsif current_state = T1 then
-            control_out <= ('1','1', '1', ALU_ADD);
+            control_out <= ('1','1', '1', OpCodeToAluOperation(instruction.opcode));
         else
-            control_out <= ('0','0', '0', ALU_NOP);
+            control_out <= ('0','0', '0', OpCodeToAluOperation(instruction.opcode));
         end if;
     end process;
 end architecture;
